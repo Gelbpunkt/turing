@@ -1,0 +1,39 @@
+# Program to duplicate a bunch of 1s
+# e.g. _111111_ -> _111111_111111_
+
+# Initital state
++0
+# End state
+-6
+
+# State 0: Find the next 1 to the right
+0,0,0,0,r
+# We found a 1! Now write a 0 and go to state 1
+0,1,1,0,r
+# We hit empty space before we found a 1! This means we are done copying and only 0s are left
+0,5,_,_,l
+
+# State 1: Go to the first empty space (i.e. beginning of copied data)
+1,1,0,0,r
+1,1,1,1,r
+# We found the first empty space! Now keep it there and go to state 2
+1,2,_,_,r
+
+# State 2: Find the first empty space and write a 1
+2,2,1,1,r
+# Found it! Go left and go to state 3
+2,3,_,1,l
+
+# State 3: Go left until we hit the first empty space (i.e. end of data to copy)
+3,3,1,1,l
+# Found it! Go left and go to state 4
+3,4,_,_,l
+
+# State 4: Go left until we hit the first zero (i.e. beginning of remaining data to copy)
+4,4,1,1,l
+# Found it! Continue with state 0
+4,0,0,0,r
+
+# State 5: Set all 0s to 1s left of cursor
+5,5,0,1,l
+5,6,_,_,r

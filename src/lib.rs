@@ -45,4 +45,16 @@ mod tests {
         let mut machine = TuringMachine::from_tape(tape);
         assert!(machine.execute(&program).is_ok());
     }
+
+    #[test]
+    fn test_copy() {
+        let program = Program::from_str(include_str!("../examples/copy.tng")).unwrap();
+        let tape = VecTape::from_str("_111111_").unwrap();
+        let mut machine = TuringMachine::from_tape(tape);
+        machine.execute(&program).unwrap();
+        assert_eq!(
+            machine.tape().inner,
+            VecTape::from_str("_111111_111111").unwrap().inner
+        );
+    }
 }

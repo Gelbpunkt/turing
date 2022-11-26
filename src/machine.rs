@@ -1,4 +1,4 @@
-use crate::{tape::Tape, Program, State, ExecutionError, Move};
+use crate::{tape::Tape, ExecutionError, Move, Program, State};
 
 /// The actual turing machine that can execute [`Program`]s.
 #[derive(Debug)]
