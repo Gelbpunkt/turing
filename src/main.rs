@@ -1,6 +1,6 @@
 use std::{env::args, fs::read_to_string, process::exit, str::FromStr, time::Instant};
 
-use turing::{Tape, Program, TuringMachine};
+use turing::{Program, TuringMachine, VecTape};
 
 fn main() {
     let mut args = args();
@@ -16,7 +16,7 @@ fn main() {
         exit(1);
     });
 
-    let tape = Tape::from_str(&tape).unwrap_or_else(|_| {
+    let tape = VecTape::from_str(&tape).unwrap_or_else(|_| {
         eprintln!("Tape buffer is invalid.");
         exit(1);
     });
