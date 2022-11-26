@@ -1,4 +1,5 @@
 use std::{
+    collections::VecDeque,
     fmt::{self, Write},
     str::FromStr,
 };
@@ -124,6 +125,99 @@ impl FromStr for VecTape {
 }
 
 impl fmt::Display for VecTape {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for segment in &self.inner {
+            match segment {
+                Segment::One => f.write_char('1')?,
+                Segment::Zero => f.write_char('0')?,
+                Segment::Empty => f.write_char('_')?,
+            }
+        }
+
+        Ok(())
+    }
+}
+
+/// A [`Tape`] backed by a [`VecDeque`].
+#[derive(Debug, PartialEq, Eq)]
+pub struct VecDequeTape {
+    pub(crate) inner: VecDeque<Segment>,
+    position: usize,
+}
+
+impl VecDequeTape {
+    /// Create a new tape with a known part of the tape and a
+    /// specific cursor position.
+    ///
+    /// # Panics
+    ///
+    /// This method will panic if the position is outside of the tape segment.
+    #[must_use]
+    pub fn new(inner: VecDeque<Segment>, position: usize) -> Self {
+        assert!(position < inner.len());
+        Self { inner, position }
+    }
+}
+
+impl Tape for VecDequeTape {
+    fn right(&mut self) {
+        self.position += 1;
+
+        if self.position == self.inner.len() {
+            self.inner.push_back(Segment::Empty);
+        }
+    }
+
+    fn left(&mut self) {
+        if self.position == 0 {
+            self.inner.push_front(Segment::Empty);
+        } else {
+            self.position -= 1;
+        }
+    }
+
+    fn put(&mut self, segment: Segment) {
+        self.inner[self.position] = segment;
+    }
+
+    fn current(&self) -> &Segment {
+        &self.inner[self.position]
+    }
+}
+
+impl FromStr for VecDequeTape {
+    type Err = InvalidProgram;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut inner = VecDeque::with_capacity(s.len());
+        let mut position = 0;
+
+        for (idx, part) in s.chars().enumerate() {
+            match part {
+                '1' => {
+                    inner.push_back(Segment::One);
+
+                    if position == 0 {
+                        position = idx;
+                    }
+                }
+                '0' => {
+                    inner.push_back(Segment::Zero);
+
+                    if position == 0 {
+                        position = idx;
+                    }
+                }
+                '_' | ' ' => inner.push_back(Segment::Empty),
+                _ => return Err(InvalidProgram::InvalidSegment),
+            }
+        }
+
+        Ok(Self { inner, position })
+    }
+}
+
+impl fmt::Display for VecDequeTape {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for segment in &self.inner {
             match segment {
